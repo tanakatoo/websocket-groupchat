@@ -10,17 +10,17 @@ const name = prompt("Username?");
 
 /** called when connection opens, sends join info to server. */
 
-ws.onopen = function(evt) {
+ws.onopen = function (evt) {
   console.log("open", evt);
 
-  let data = {type: "join", name: name};
+  let data = { type: "join", name: name };
   ws.send(JSON.stringify(data));
 };
 
 
 /** called when msg received from server; displays it. */
 
-ws.onmessage = function(evt) {
+ws.onmessage = function (evt) {
   console.log("message", evt);
 
   let msg = JSON.parse(evt.data);
@@ -61,7 +61,16 @@ ws.onclose = function (evt) {
 $('form').submit(function (evt) {
   evt.preventDefault();
 
-  let data = {type: "chat", text: $("#m").val()};
+  let data
+  if ($("#m").val() == "/members") {
+    data = { type: "displayAll", text: "" }
+  } else if ($("#m").val().substring(0, 5) == "/priv") {
+    data = { type: "private", text: $("#m").val().slice(6) }
+  }
+  else {
+    data = { type: "chat", text: $("#m").val() };
+  }
+
   ws.send(JSON.stringify(data));
 
   $('#m').val('');

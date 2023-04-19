@@ -44,12 +44,28 @@ class Room {
     this.members.delete(member);
   }
 
+  find(name) {
+    //find and return member name
+    let member
+    for (let mem of this.members) {
+      if (mem.name == name) {
+        return mem
+      }
+    }
+    return "none"
+  }
+
   /** send message to all members in a room. */
 
   broadcast(data) {
     for (let member of this.members) {
       member.send(JSON.stringify(data));
     }
+  }
+
+  displayMembers(room) {
+    console.log('displaying member in room', this.members)
+
   }
 }
 

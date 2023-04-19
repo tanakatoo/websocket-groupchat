@@ -20,6 +20,7 @@ class ChatUser {
 
   send(data) {
     try {
+      console.log('we are in user send', data)
       this._send(data);
     } catch {
       // If trying to send to a user fails, ignore it
@@ -55,10 +56,61 @@ class ChatUser {
 
   handleMessage(jsonData) {
     let msg = JSON.parse(jsonData);
-
+    console.log('we are in handling message, jsondata is', jsonData)
     if (msg.type === 'join') this.handleJoin(msg.name);
+    else if (msg.text === '/joke') {
+      this.handleJoke("KnockKnock!")
+
+    } else if (msg.type === 'displayAll') {
+      this.displayMembers()
+    } else if (msg.type === "private") {
+      console.log('we are in private ')
+      this.privateMsg(msg.text)
+    }
     else if (msg.type === 'chat') this.handleChat(msg.text);
+
     else throw new Error(`bad message: ${msg.type}`);
+  }
+
+  privateMsg(text) {
+    const msgArr = text.split(" ");
+    const name = msgArr[0]
+    const msg = msgArr[1]
+
+    //get user 
+    let result = this.room.find(name)
+    if (result != 'none') {
+      //member found
+
+      result.send(JSON.stringify({
+        name: this.name,
+        type: 'chat',
+        text: `private text: ${msg}`
+      }))
+    }
+  }
+
+  displayMembers() {
+    console.log('in display members in user class')
+    let memberList = ''
+    for (let member of this.room.members) {
+      console.log('name is', member.name)
+      memberList += member.name + ', '
+    }
+    this.send(JSON.stringify({
+      name: this.name,
+      type: 'chat',
+      text: memberList
+    }))
+  }
+
+  handleJoke(text) {
+    console.log('text is', text)
+    this.send(JSON.stringify({
+      name: this.name,
+      type: 'chat',
+      text: text
+    }))
   }
 
   /** Connection was closed: leave room, announce exit to others */
